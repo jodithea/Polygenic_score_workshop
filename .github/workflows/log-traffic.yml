@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-       - name: Debug Views JSON
+      - name: Debug Views JSON
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: jodithea/Polygenic_score_workshop
@@ -27,7 +27,6 @@ jobs:
         run: |
           curl -s -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/$REPO/traffic/clones
 
-
       - name: Log traffic stats (views + clones)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,53 +34,3 @@ jobs:
         run: |
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           TRAFFIC_FILE="traffic_log.csv"
-          TEMP_FILE="traffic_temp.csv"
-
-          # Create header if file doesn't exist
-          if [ ! -f "$TRAFFIC_FILE" ]; then
-            echo "timestamp,type,count,uniques" > $TRAFFIC_FILE
-          fi
-
-          # Get views
-          VIEWS_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/$REPO/traffic/views)
-          VIEWS_COUNT=$(echo "$VIEWS_JSON" | jq '.count')
-          VIEWS_UNIQUES=$(echo "$VIEWS_JSON" | jq '.uniques')
-          echo "$DATE,views,$VIEWS_COUNT,$VIEWS_UNIQUES" >> $TRAFFIC_FILE
-
-          # Get clones
-          CLONES_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/$REPO/traffic/clones)
-          CLONES_COUNT=$(echo "$CLONES_JSON" | jq '.count')
-          CLONES_UNIQUES=$(echo "$CLONES_JSON" | jq '.uniques')
-          echo "$DATE,clones,$CLONES_COUNT,$CLONES_UNIQUES" >> $TRAFFIC_FILE
-
-          # OPTIONAL: Get release asset download counts
-          RELEASES_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/$REPO/releases)
-          echo "$RELEASES_JSON" | jq -r '.[] | .assets[]? | "'$DATE',download,\(.name),\(.download_count)"' >> $TRAFFIC_FILE
-
-          # === Add summary lines ===
-          {
-            echo "timestamp,type,count,uniques"
-
-            # Compute summary from entries, skipping header and old summaries
-            tail -n +2 "$TRAFFIC_FILE" | grep -v '^summary' | awk -F, '
-              $2 == "views" && $3 ~ /^[0-9]+$/ { v += $3; vu += $4 }
-              $2 == "clones" && $3 ~ /^[0-9]+$/ { c += $3; cu += $4 }
-              END {
-                printf("summary,views,%d,%d\n", v, vu)
-                printf("summary,clones,%d,%d\n", c, cu)
-              }
-            '
-
-            # Append actual records (skip old summary if re-running)
-            tail -n +2 "$TRAFFIC_FILE" | grep -v '^summary'
-          } > "$TEMP_FILE" && mv "$TEMP_FILE" "$TRAFFIC_FILE"
-
-          # Commit and push
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add $TRAFFIC_FILE
-          git commit -m "Update traffic log: $DATE" || echo "No changes to commit"
-          git push

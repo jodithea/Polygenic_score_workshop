@@ -2,7 +2,7 @@
 
 * Workshop on creating polygenic scores and using statistical methods to evaluate their performance
 * Github repository to accompany Polygenic Scores Workshop given at Adelaide Medical School on Thursday 24 July 2025
-	- '01_Creating_Polygenic_Scores.pdf': Presentation given by Dr Brittany Mitchell (still to upload)
+	- '01_Creating_Polygenic_Scores.pdf': Presentation given by Dr Brittany Mitchell
 	- '02_Evaluating_Polygenic_Scores.pdf': Presentation given by Dr Jodi Thomas
 
 # Getting Started

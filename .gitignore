@@ -12,3 +12,5 @@ Genotype_data/
 *.prune.out
 *.log
 Jodi_notes.txt
+02_Evaluate_PGS/02_Evaluate_PGS_in_R/.RData
+02_Evaluate_PGS/02_Evaluate_PGS_in_R/.Rhistory

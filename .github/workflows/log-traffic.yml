@@ -15,21 +15,21 @@ jobs:
 
       - name: Debug Views JSON
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TRAFFIC_TOKEN }}
           REPO: jodithea/Polygenic_score_workshop
         run: |
           curl -s -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/$REPO/traffic/views
 
       - name: Debug Clones JSON
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TRAFFIC_TOKEN }}
           REPO: jodithea/Polygenic_score_workshop
         run: |
           curl -s -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/$REPO/traffic/clones
 
       - name: Log traffic stats (views + clones)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: GH_TOKEN: ${{ secrets.GH_TRAFFIC_TOKEN }}
           REPO: jodithea/Polygenic_score_workshop
         run: |
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")

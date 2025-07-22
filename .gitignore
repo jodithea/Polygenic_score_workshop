@@ -1,0 +1,14 @@
+Published_summary_stats/
+Genotype_data/
+01_Create_PGS/blocks/
+01_Create_PGS/SBayesRC_output/
+01_Create_PGS/aligned_genotype_data/
+01_Create_PGS/Plink_PGS_scores/
+01_Create_PGS/ILAE3_Caucasian_all_epilepsy_imputed_allblocks.ma
+01_Create_PGS/tests/
+*.sh.*
+.Rproj.user
+*.prune.in
+*.prune.out
+*.log
+Jodi_notes.txt

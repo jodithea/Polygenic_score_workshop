@@ -1,0 +1,328 @@
+---
+title: "Polygenic Scores Workshop: Evaluation of Polygenic Scores in R"
+author: "Jodi T Thomas"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    collapse: no
+    df_print: paged
+    highlight: textmate
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 12
+    toc: yes
+    toc_float: yes
+    toc_depth: 4
+    code_folding: hide
+  pdf_document:
+    df_print: default
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 12
+    highlight: tango
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  word_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 12
+    highlight: tango
+    toc: yes
+    toc_depth: 2
+documentclass: article
+classoption: a4paper
+fontsize: 12pt
+mainfont: Arial
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval=FALSE, warning=FALSE, message=FALSE, error=FALSE)
+options(tinytex.engine = 'xelatex')
+```
+
+```{r Setwd, results='markdown', eval=TRUE, echo=FALSE}
+#Set working directory to location of folder holding all files
+setwd("/mnt/lustre/working/lab_nickm/jodiT/PGS_Workshop/02_Evaluate_PGS/02_Evaluate_PGS_in_R/")
+```
+
+```{r readRScripts, results='markdown', eval=TRUE, echo=FALSE}
+#Read in R scripts
+knitr::read_chunk('Scripts/01_Load_packages_and_data.R')
+knitr::read_chunk('Scripts/02_Logistic_regression.R')
+knitr::read_chunk('Scripts/03_Nagelkerkes_R2.R')
+knitr::read_chunk('Scripts/04_R2_liability_scale.R')
+knitr::read_chunk('Scripts/05_OR_by_decile_of_PGS.R')
+knitr::read_chunk('Scripts/06_AUC_Method1.R')
+knitr::read_chunk('Scripts/07_AUC_Method2.R')
+```
+
+```{r LoadDataRmd, eval = TRUE, echo = FALSE}
+load(file = "Data/Df.Rdata")
+load(file = "Results/logistic_regression_models.Rdata")
+load(file = "Results/decile_model.Rdata")
+load(file = "Results/roc_model_PGS.Rdata")
+load(file = "Results/roc_models_covar_full.Rdata")
+load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
+``` 
+
+
+# Load Packages
+```{r LoadPackages, eval=TRUE}
+```
+
+# Load Data
+```{r LoadData}
+
+```
+
+# Tidy Data
+```{r TidyData}
+
+```
+
+# Logistic Regression
+
+* Determine direction of relationship between outcome (epilepsy case/control) and predictor (PGS for epilepsy)
+
+## Explore Data
+
+* Data exploration before fitting model
+
+```{r Exploration, eval = T}
+
+```
+
+## Fit Models
+
+```{r FitModels}
+
+```
+
+## Check Models
+
+* Check model assumptions are met
+
+### Covariates only model
+
+```{r CheckModelCovar, eval = T}
+
+```
+
+### Full model including PGS
+```{r CheckModelFull, eval = T}
+
+```
+
+## Results
+
+* Check odds ratio - is the relationship between epilepsy (case/control) and PGS for epilepsy in the expected direction (i.e. positive, so an OR > 1)?
+  - If the relationship is in the opposite direction to what is expected, check that the columns for effect allele and other allele were correct (and not flipped) in the GWAS summary statistics used to make the PGS
+
+### Table
+
+```{r RegressionResultsTable, eval = T}
+
+```
+
+### Graph
+
+```{r RegressionResultsGraph, eval = T}
+
+```
+
+
+# Nagelkerke's R<sup>2</sup>
+
+* To quantify the variance attributable to the polygenic score (PGS), we compute: Nagelkerke's R<sup>2</sup> attributable to the PGS: Nagelkerke's R<sup>2</sup>(full model) - Nagelkerke's R<sup>2</sup>(covariates only model)
+* As we're using a binary trait and a logistic regression we use a pseudo-R<sup>2</sup> value, here Nagelkerke's R<sup>2</sup>
+* Nagelkerke's R<sup>2</sup> is is an adjusted version of Cox and Snell's R<sup>2</sup>, scaled to a range of 0 to 1 for easier interpretation
+* However, as a pseudo R<sup>2</sup>, this value cannot be interpreted as the proportion of variance explained in the same way R<sup>2</sup> is used in a linear regression. 
+* Instead this pseudo R<sup>2</sup> is a relative measure of model fit, representing an approximation of explained variance:
+  - 0 means the model explains none of the variation in the outcome
+  - 1 means the model explains all the variation in the outcome
+* You can use some general thresholds to interpret Nagelkerke's R<sup>2</sup> (these thresholds can change across fields). E.g. :
+  - 0 - 0.1: weak explanatory power
+  - 0.1 - 0.3, moderate explanatory power
+  - 0.3 - 0.5, strong explanatory power
+  - \> 0.5 very strong explanatory power
+* Nagelkerke's R<sup>2</sup> is calculated on the observed binary scale
+  - Depends on the case/control ratio in your sample
+  - Cannot be compared across studies with different case/control ascertainment
+  - Does not estimate heritability
+* Thus, Nagelkerke's R<sup>2</sup> is not a very interpretable measure of variance explained.
+
+```{r NagelkerkeR2, eval = T}
+
+```
+
+# R<sup>2</sup> on the Liability Scale
+
+* Variance in outcome variable risk explained on the liability scale, attributable to PGS
+* We run linear regressions, even though our outcome is binary, to calculate R<sup>2</sup> for our covariates + PGS model and covariates only model, then do R<sup>2</sup>(covariates + PGS) - R<sup>2</sup> (covariates only) to calculate R<sup>2</sup> attributable to PGS
+* This R<sup>2</sup> is on the observed scale
+  - It is biased by case/control ratio in your sample 
+* So we adjust R<sup>2</sup> to the liability scale, which reflects a latent (normally distributed) trait underlying disease risk.
+* For more details, see publication: Lee SH, et al., A Better Coefficient of Determination for Genetic Profile Analysis. Genetic Epidemiology, 2012. 36(3):214-224
+* Observed R<sup>2</sup>: tells you how well your PRS predicts actual case/control status in your sample.
+* Liability R<sup>2</sup>: tells you how much of the underlying genetic liability is explained by your PRS, standardized to population-level risk.
+  - This is critical if you want to compare PRS performance across studies
+  - Liability R<sup>2</sup> can be compared to SNP-based heritability estimates, e.g. as estimated from using GWAS summary statistics in LDSC software 
+
+
+## Calculate Vairance explained on Liability Scale
+
+* Function to convert observed R<sup>2</sup> to R<sup>2</sup> on liability scale
+* From Lee SH, et al., A Better Coefficient of Determination for Genetic Profile Analysis. Genetic Epidemiology, 2012. 36(3):214-224
+```{r VarExplainedLiabilityScaleFunction}
+
+```
+
+* Fit linear models to calculate observed R<sup>2</sup> for model with covariates only and model with caovariates + PGS
+* Convert observed R<sup>2</sup> to R<sup>2</sup> onliability scale using above function
+* Calculate R<sup>2</sup> (liability) attributale to PGS and R<sup>2</sup> (liability) (covariates + PGS) - R<sup>2</sup> (liability) (covariates only)
+* Run bootstrapping to calculate confidence intervals
+
+```{r VarExplainedLiabilityScaleRun}
+
+```
+
+## Results Table
+```{r R2lResultsTable, eval = T}
+
+```
+
+* R<sup>2</sup> (liability) = 0.08, which means 8% of the variance in epilepsy risk (on the liabilty scale) is attributable to the epilepsy polygenic score
+* This value can be compared to SNP-based heritability (on liability scale), as both reflect the proportion of variance in liability explained by common SNPs
+
+# Odds Ratio by Decile of PGS
+
+* Cut the distribution of PGS into deciles, with each decile containing cases and controls
+* Calculate the odds ratio of each PGS decile compared to the first (lowest) PGS decile or the middle (5th and 6th) deciles
+* This is a practical and interpretable way to visualise that there could be utility in using high vs low PGS
+* But this method also doesn't take into account the proportion of cases and controls in your data - it will look much more impressive if you have a data set with 50% cases and 50% controls, compared to a population sample.
+
+
+## Create PGS Decile Data
+```{r TidyDataDecile}
+
+```
+
+
+## Fit Model
+
+```{r FitModelDecile}
+
+```
+
+## Check Model {.tabset .tabset-fade}
+
+### Reference: Lowest decile
+```{r CheckModelDecileLowest, eval = T}
+
+```
+
+### Reference: 5th and 6th deciles
+
+```{r CheckModelDecileMid, eval = T}
+
+```
+
+## Results {.tabset .tabset-fade}
+
+### Reference: Lowest decile
+#### Table
+
+* Odds ratio for each PGS decile compared to the first decile
+* Adjust p-value for nine tests, using Benjamini-Hochberg method
+
+```{r DecileModelResultsTableLowest, eval = T}
+
+```
+
+#### Graph
+```{r DecileModelResultsGraphLowest, eval = T}
+
+```
+
+### Reference: 5th and 6th decile
+#### Table
+
+* Odds ratio for each PGS decile compared to the middle (5th and 6th) deciles
+* Adjust p-value for nine tests, using Benjamini-Hochberg method
+
+```{r DecileModelResultsTableMid, eval = T}
+
+```
+
+#### Graph
+```{r DecileModelResultsGraphMid, eval = T}
+
+```
+
+
+# Area under the Curve (AUC) 
+
+* AUC from Receiver Operating Characteristic (ROC) analysis
+* AUC = Probability that a randomly selected case has a higher test score than a randomly selected control
+* Range 0.5 to 1
+  - 0.5 = no discrimination of cases from controls
+  - 1 = perfect discrimination
+* The AUC is a measure of how well the PGS predicts a binary outcome (case/control status)
+* The AUC is independent to proportion of cases and controls in sample
+* But, the AUC is constrained by how well your PGS reflects the underlying genotype-to-phenotype relationship 
+  - If your PRS does not accurately capture the genetic architecture, then AUC will be low even if there is true heritability
+  - The PRS is a proxy, it doesn't measure true genetic risk perfectly
+  - So AUC is ultimatley limited by how well the PRS captures phenotype-genotype associations
+* The maximum AUC achievable depend on the heritability of the disease
+  - The theoretical maximum AUC a PRS can achieve is limited by the heritability of the trait.
+  - For traits with low SNP heritability (h<sup>2</sup>), even a perfect PRS (trained on infinite data) can’t fully separate cases and controls.
+* So the AUC has a problem with genetic interpretation
+  - A high or low AUC doesn’t directly tell you about genetic architecture
+  - You can’t assume that a low AUC means genetics don’t matter. Maybe your PGS is underpowered or poorly constructed, or maybe the trait is polygenic with small effects spread over many SNPs, limiting predictive ability.
+
+## Method 1: PGS Only
+
+* ROC analysis only using the PGS as a predictor
+
+### ROC analysis
+```{r ROCFitMethod1}
+
+```
+
+### Results 
+
+#### Table
+```{r AUCResultsMethod1, eval = T}
+
+```
+
+#### Graph
+```{r AUCPlotMethod1, eval= T}
+
+```
+
+
+## Method 2: PGS + Covariates
+
+* Find AUC attributable to PGS
+* AUC(covariates plus PGS) - AUC(covariates only)
+
+### ROC analysis
+```{r ROCFitMethod2}
+
+```
+
+### Results 
+
+#### Table
+```{r AUCResultsMethod2, eval = T}
+
+```
+
+#### Graph
+```{r AUCPlotMethod2, eval= T}
+
+```
+

@@ -77,7 +77,7 @@ Follow the scripts in the '01_Create_PGS' directory. Below is a step-by-step sum
 * Confirm that genome builds are consistent:
 	- The LD matrix provided in GCTB is on build 37 so your GWAS summary statistics should also be on build 37 (the GWAS summary statistics we are using here are build 37)
 	- Conduct conversions if needed 
-* The GWAS summary statistics should have undergone some QC (as described in the associated publicatiom) but we will perform some basic QC
+* The GWAS summary statistics should have undergone some QC (as described in the associated publication) but we will perform some basic QC
 	-  Filter SNPs with MAF > 0.01
 	- Filter on imputation score > 0.6 (if this data is available)
 * Reformat the GWAS summary statistics to COJO format (required by SBayesRC)
@@ -160,7 +160,7 @@ Follow the scripts in the '01_Create_PGS' directory. Below is a step-by-step sum
 		- Reports effect sizes as an odds ratio
 	- Nagelkerke's R<sup>2</sup>
 		- Script: '03_Nagelkerkes_R2.R'
-		- Estimate the proportion of variance in epilepsy status explained by the PGS
+		- Estimate the pseduoRR<sup>2</sup> explained by the PGS
 	- R<sup>2</sup> on the liability scale
 		- Script: '04_R2_liability_scale.R'
 		- Estimate variance explained by the PGS on the liability scale for epilepsy risk

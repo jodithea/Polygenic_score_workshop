@@ -14,7 +14,7 @@
 * In your terminal or HPC environemnt, run:
 
 ```bash
-git clone https://github.com/jodithea/Polygenic_score_worshop.git
+git clone https://github.com/jodithea/Polygenic_score_workshop.git
 ```
 
 ## Get data to use in this Workshop

@@ -16,7 +16,7 @@ jobs:
       - name: Log traffic stats (views + clones)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: jodithea/Polygenic_score_worshop
+          REPO: jodithea/Polygenic_score_workshop
         run: |
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           TRAFFIC_FILE="traffic_log.csv"

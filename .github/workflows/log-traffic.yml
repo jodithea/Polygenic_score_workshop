@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-	 - name: Debug Views JSON
+       - name: Debug Views JSON
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: jodithea/Polygenic_score_workshop

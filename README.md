@@ -160,7 +160,7 @@ Follow the scripts in the '01_Create_PGS' directory. Below is a step-by-step sum
 		- Reports effect sizes as an odds ratio
 	- Nagelkerke's R<sup>2</sup>
 		- Script: '03_Nagelkerkes_R2.R'
-		- Estimate the pseduoRR<sup>2</sup> explained by the PGS
+		- Estimate the pseduo-R<sup>2</sup> explained by the PGS
 	- R<sup>2</sup> on the liability scale
 		- Script: '04_R2_liability_scale.R'
 		- Estimate variance explained by the PGS on the liability scale for epilepsy risk

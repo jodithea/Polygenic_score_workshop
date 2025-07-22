@@ -42,23 +42,22 @@ jobs:
           fi
 
           # Get views
-          VIEWS_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/$REPO/traffic/views)
-          VIEWS_COUNT=$(echo "$VIEWS_JSON" | jq '.count')
-          VIEWS_UNIQUES=$(echo "$VIEWS_JSON" | jq '.uniques')
+          VIEWS_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/traffic/views")
+          VIEWS_COUNT=$(echo "$VIEWS_JSON" | jq '.count // 0')
+          VIEWS_UNIQUES=$(echo "$VIEWS_JSON" | jq '.uniques // 0')
+          echo "DEBUG: Views count=$VIEWS_COUNT uniques=$VIEWS_UNIQUES"
           echo "$DATE,views,$VIEWS_COUNT,$VIEWS_UNIQUES" >> $TRAFFIC_FILE
 
           # Get clones
-          CLONES_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/$REPO/traffic/clones)
-          CLONES_COUNT=$(echo "$CLONES_JSON" | jq '.count')
-          CLONES_UNIQUES=$(echo "$CLONES_JSON" | jq '.uniques')
+          CLONES_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/traffic/clones")
+          CLONES_COUNT=$(echo "$CLONES_JSON" | jq '.count // 0')
+          CLONES_UNIQUES=$(echo "$CLONES_JSON" | jq '.uniques // 0')
+          echo "DEBUG: Clones count=$CLONES_COUNT uniques=$CLONES_UNIQUES"
           echo "$DATE,clones,$CLONES_COUNT,$CLONES_UNIQUES" >> $TRAFFIC_FILE
 
           # OPTIONAL: Get release asset download counts
-          RELEASES_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/$REPO/releases)
-          echo "$RELEASES_JSON" | jq -r '.[] | .assets[]? | "'$DATE',download,\(.name),\(.download_count)"' >> $TRAFFIC_FILE
+          RELEASES_JSON=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$REPO/releases")
+          echo "$RELEASES_JSON" | jq -r --arg date "$DATE" '.[] | .assets[]? | "\($date),download,\(.name),\(.download_count)"' >> $TRAFFIC_FILE
 
           # === Add summary lines ===
           {

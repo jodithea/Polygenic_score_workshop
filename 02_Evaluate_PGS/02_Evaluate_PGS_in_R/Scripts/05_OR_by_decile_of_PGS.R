@@ -25,7 +25,7 @@ Df_mid <- Df %>%
   )
 ## ----
 
-## ---- FitModelDecileLowest
+## ---- FitModelDecile
 # Run logistic regression with the PGS decile as the predictor
 decile_model_lowest <- glm(Epilepsy ~ PGS_decile + Sex + PC1 + PC2 + PC3 + PC4 + PC5 + PC6,
                     family = binomial(link = 'logit'),

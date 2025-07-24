@@ -84,7 +84,8 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 
 # Logistic Regression
 
-* Determine direction of relationship between outcome (epilepsy case/control) and predictor (PGS for epilepsy)
+* Determine direction and strength of relationship between outcome (epilepsy case/control) and predictor (PGS for epilepsy)
+* Is there a significant association between outcome and predictor?
 
 ## Explore Data
 
@@ -135,10 +136,10 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 
 # Nagelkerke's R<sup>2</sup>
 
-* To quantify the variance attributable to the polygenic score (PGS), we compute: Nagelkerke's R<sup>2</sup> attributable to the PGS: Nagelkerke's R<sup>2</sup>(full model) - Nagelkerke's R<sup>2</sup>(covariates only model)
+* Estimate Nagelkerke's R<sup>2</sup> attributable to the polygenic score (PGS) = Nagelkerke's R<sup>2</sup>(full model) - Nagelkerke's R<sup>2</sup>(covariates only model)
 * As we're using a binary trait and a logistic regression we use a pseudo-R<sup>2</sup> value, here Nagelkerke's R<sup>2</sup>
 * Nagelkerke's R<sup>2</sup> is is an adjusted version of Cox and Snell's R<sup>2</sup>, scaled to a range of 0 to 1 for easier interpretation
-* However, as a pseudo R<sup>2</sup>, this value cannot be interpreted as the proportion of variance explained in the same way R<sup>2</sup> is used in a linear regression. 
+* However, as a pseudo R<sup>2</sup>, this value cannot be interpreted as the proportion of variance explained in the same way R<sup>2</sup> is used in a linear regression.
 * Instead this pseudo R<sup>2</sup> is a relative measure of model fit, representing an approximation of explained variance:
   - 0 means the model explains none of the variation in the outcome
   - 1 means the model explains all the variation in the outcome
@@ -150,8 +151,7 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 * Nagelkerke's R<sup>2</sup> is calculated on the observed binary scale
   - Depends on the case/control ratio in your sample
   - Cannot be compared across studies with different case/control ascertainment
-  - Does not estimate heritability
-* Thus, Nagelkerke's R<sup>2</sup> is not a very interpretable measure of variance explained.
+  - Is not comparable to SNP-based heritability
 
 ```{r NagelkerkeR2, eval = T}
 
@@ -159,16 +159,17 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 
 # R<sup>2</sup> on the Liability Scale
 
-* Variance in outcome variable risk explained on the liability scale, attributable to PGS
-* We run linear regressions, even though our outcome is binary, to calculate R<sup>2</sup> for our covariates + PGS model and covariates only model, then do R<sup>2</sup>(covariates + PGS) - R<sup>2</sup> (covariates only) to calculate R<sup>2</sup> attributable to PGS
+* Variance in the outcome variable risk explained on the liability scale, attributable to the PGS
+* We run linear regressions, even though our outcome is binary, to calculate R<sup>2</sup> for our covariates + PGS model and covariates only model
 * This R<sup>2</sup> is on the observed scale
   - It is biased by case/control ratio in your sample 
 * So we adjust R<sup>2</sup> to the liability scale, which reflects a latent (normally distributed) trait underlying disease risk.
 * For more details, see publication: Lee SH, et al., A Better Coefficient of Determination for Genetic Profile Analysis. Genetic Epidemiology, 2012. 36(3):214-224
-* Observed R<sup>2</sup>: tells you how well your PRS predicts actual case/control status in your sample.
-* Liability R<sup>2</sup>: tells you how much of the underlying genetic liability is explained by your PRS, standardized to population-level risk.
-  - This is critical if you want to compare PRS performance across studies
-  - Liability R<sup>2</sup> can be compared to SNP-based heritability estimates, e.g. as estimated from using GWAS summary statistics in LDSC software 
+* Observed R<sup>2</sup>: tells you how well your PGS predicts actual case/control status in your sample.
+* Liability R<sup>2</sup>: tells you how much of the underlying genetic liability is explained by your PGS, standardized to population-level risk.
+  - This is critical if you want to compare PGS performance across studies
+  - Liability R<sup>2</sup> is comparable to SNP-based heritability estimates, e.g. as estimated from using GWAS summary statistics in LDSC software 
+* Then do Liability R<sup>2</sup>(covariates + PGS) - Liability R<sup>2</sup> (covariates only) to calculate Liability R<sup>2</sup> attributable to the PGS
 
 
 ## Calculate Vairance explained on Liability Scale
@@ -180,8 +181,8 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 ```
 
 * Fit linear models to calculate observed R<sup>2</sup> for model with covariates only and model with caovariates + PGS
-* Convert observed R<sup>2</sup> to R<sup>2</sup> onliability scale using above function
-* Calculate R<sup>2</sup> (liability) attributale to PGS and R<sup>2</sup> (liability) (covariates + PGS) - R<sup>2</sup> (liability) (covariates only)
+* Convert observed R<sup>2</sup> to R<sup>2</sup> on liability scale using above function
+* Calculate R<sup>2</sup> (liability) attributable to PGS = R<sup>2</sup> (liability) (covariates + PGS) - R<sup>2</sup> (liability) (covariates only)
 * Run bootstrapping to calculate confidence intervals
 
 ```{r VarExplainedLiabilityScaleRun}
@@ -193,7 +194,7 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 
 ```
 
-* R<sup>2</sup> (liability) = 0.08, which means 8% of the variance in epilepsy risk (on the liabilty scale) is attributable to the epilepsy polygenic score
+* R<sup>2</sup> (liability) = 0.05, which means 5% of the variance in epilepsy risk (on the liabilty scale) is attributable to the epilepsy polygenic score
 * This value can be compared to SNP-based heritability (on liability scale), as both reflect the proportion of variance in liability explained by common SNPs
 
 # Odds Ratio by Decile of PGS
@@ -210,7 +211,7 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 ```
 
 
-## Fit Model
+## Fit Model 
 
 ```{r FitModelDecile}
 
@@ -250,7 +251,7 @@ load(file = "Results/r2_liability_attributable_PGS_bootstrapping.Rdata")
 #### Table
 
 * Odds ratio for each PGS decile compared to the middle (5th and 6th) deciles
-* Adjust p-value for nine tests, using Benjamini-Hochberg method
+* Adjust p-value for eight tests, using Benjamini-Hochberg method
 
 ```{r DecileModelResultsTableMid, eval = T}
 

@@ -43,7 +43,7 @@ ggplot(Df, aes(x = scale(SCORESUM), colour = as.factor(Epilepsy), fill = as.fact
             legend.position = "right")
 ## ----
 
-## --- FitModels
+## ---- FitModels
 logistic_regression_covar <- glm(Epilepsy ~ Sex + PC1 + PC2 + PC3 + PC4 + PC5 + PC6,
                                family = binomial(link = 'logit'),
                                data = Df)

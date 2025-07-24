@@ -41,25 +41,27 @@ jobs:
             echo "timestamp,type,count,uniques" > "$TRAFFIC_FILE"
           fi
 
-          # Fetch views and clones daily data into temp file
+          # Fetch new traffic data into TEMP_FILE
           gh api repos/$REPO/traffic/views --jq '.views[] | "\(.timestamp),views,\(.count),\(.uniques)"' > "$TEMP_FILE"
           gh api repos/$REPO/traffic/clones --jq '.clones[] | "\(.timestamp),clones,\(.count),\(.uniques)"' >> "$TEMP_FILE"
 
-          # Merge old and new data, deduplicate by timestamp and type (keep last occurrence),
-          # then sort by timestamp ascending
-          awk -F, '{
+          # Merge, deduplicate, and sort data by timestamp (skip old summaries and headers)
+          {
+            grep -vE '^(summary|timestamp)' "$TRAFFIC_FILE"
+            cat "$TEMP_FILE"
+          } | awk -F, '{
             key = $1","$2;
             data[key] = $0;
           }
           END {
             for (k in data) print data[k]
-          }' "$TEMP_FILE" "$TRAFFIC_FILE" | sort -t, -k1,1 > "$MERGED_FILE"
+          }' | sort -t, -k1,1 > "$MERGED_FILE"
 
-          # Calculate running totals from merged data
+          # Calculate running totals
           VIEWS_TOTAL=$(grep ',views,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')
           CLONES_TOTAL=$(grep ',clones,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')
 
-          # Write final CSV with summary at top and bottom with header lines
+          # Final CSV: summaries at top, sorted data, footer header
           {
             echo "summary,views,$VIEWS_TOTAL"
             echo "summary,clones,$CLONES_TOTAL"
@@ -68,7 +70,7 @@ jobs:
             echo "timestamp,type,count,uniques"
           } > "$TRAFFIC_FILE"
 
-          # Commit and push updated traffic_log.csv if changed
+          # Commit and push if changes
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           git add "$TRAFFIC_FILE"

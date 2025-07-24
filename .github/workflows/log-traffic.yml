@@ -2,7 +2,7 @@ name: Log GitHub Traffic
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * *"  # Every day at midnight UTC
   workflow_dispatch:
 
 jobs:
@@ -15,6 +15,17 @@ jobs:
 
       - name: Set up GitHub CLI
         run: sudo apt install gh -y
+
+      - name: Debug raw traffic API output
+        env:
+          GH_TOKEN: ${{ secrets.GH_TRAFFIC_TOKEN }}
+          REPO: jodithea/Polygenic_score_workshop
+        run: |
+          echo "== Views JSON =="
+          gh api repos/$REPO/traffic/views
+          echo
+          echo "== Clones JSON =="
+          gh api repos/$REPO/traffic/clones
 
       - name: Fetch and log traffic data
         env:
@@ -30,26 +41,27 @@ jobs:
             echo "timestamp,type,count,uniques" > "$TRAFFIC_FILE"
           fi
 
-          # Fetch latest daily views and clones using GH_TOKEN directly
-          gh api repos/$REPO/traffic/views --jq '.views[] | "\(.timestamp),views,\(.count),\(.uniques)"' >> "$TEMP_FILE"
+          # Fetch latest daily views and clones
+          gh api repos/$REPO/traffic/views --jq '.views[] | "\(.timestamp),views,\(.count),\(.uniques)"' > "$TEMP_FILE"
           gh api repos/$REPO/traffic/clones --jq '.clones[] | "\(.timestamp),clones,\(.count),\(.uniques)"' >> "$TEMP_FILE"
 
-          # Merge and deduplicate
+          # Merge old and new data, deduplicate lines
           cat "$TEMP_FILE" "$TRAFFIC_FILE" | grep -v '^summary' | sort -u > "$MERGED_FILE"
 
           # Compute running totals
           VIEWS_TOTAL=$(grep ',views,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')
           CLONES_TOTAL=$(grep ',clones,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')
 
-          # Write summary + header + logs
+          # Write summary + header + logs, keeping header at top and bottom if desired
           {
             echo "summary,views,$VIEWS_TOTAL"
             echo "summary,clones,$CLONES_TOTAL"
             echo "timestamp,type,count,uniques"
-            grep -v '^summary' "$MERGED_FILE"
+            grep -v -e '^summary' -e '^timestamp,type,count,uniques' "$MERGED_FILE"
+            echo "timestamp,type,count,uniques"
           } > "$TRAFFIC_FILE"
 
-          # Commit if there are changes
+          # Commit changes if any
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           git add "$TRAFFIC_FILE"

@@ -45,15 +45,15 @@ jobs:
           gh api repos/$REPO/traffic/views --jq '.views[] | "\(.timestamp),views,\(.count),\(.uniques)"' > "$TEMP_FILE"
           gh api repos/$REPO/traffic/clones --jq '.clones[] | "\(.timestamp),clones,\(.count),\(.uniques)"' >> "$TEMP_FILE"
 
-          # Merge old and new data, deduplicate by timestamp and type (keep last occurrence)
-          cat "$TEMP_FILE" "$TRAFFIC_FILE" | grep -v '^summary' | grep -v '^timestamp,type,count,uniques' | \
+          # Merge old and new data, deduplicate by timestamp and type (keep last occurrence),
+          # then sort by timestamp ascending
           awk -F, '{
             key = $1","$2;
             data[key] = $0;
           }
           END {
             for (k in data) print data[k]
-          }' > "$MERGED_FILE"
+          }' "$TEMP_FILE" "$TRAFFIC_FILE" | sort -t, -k1,1 > "$MERGED_FILE"
 
           # Calculate running totals from merged data
           VIEWS_TOTAL=$(grep ',views,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')

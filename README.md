@@ -11,7 +11,7 @@
 
 * Clone this repository to get a local copy of all files
 
-* In your terminal or HPC environemnt, run:
+* In your terminal or HPC environment, run:
 
 ```bash
 git clone https://github.com/jodithea/Polygenic_score_workshop.git

@@ -36,32 +36,39 @@ jobs:
           TEMP_FILE="traffic_temp.csv"
           MERGED_FILE="merged.csv"
 
-          # Ensure CSV exists
+          # Create CSV file with header if it doesn't exist
           if [ ! -f "$TRAFFIC_FILE" ]; then
             echo "timestamp,type,count,uniques" > "$TRAFFIC_FILE"
           fi
 
-          # Fetch latest daily views and clones
+          # Fetch views and clones daily data into temp file
           gh api repos/$REPO/traffic/views --jq '.views[] | "\(.timestamp),views,\(.count),\(.uniques)"' > "$TEMP_FILE"
           gh api repos/$REPO/traffic/clones --jq '.clones[] | "\(.timestamp),clones,\(.count),\(.uniques)"' >> "$TEMP_FILE"
 
-          # Merge old and new data, deduplicate lines
-          cat "$TEMP_FILE" "$TRAFFIC_FILE" | grep -v '^summary' | sort -u > "$MERGED_FILE"
+          # Merge old and new data, deduplicate by timestamp and type (keep last occurrence)
+          cat "$TEMP_FILE" "$TRAFFIC_FILE" | grep -v '^summary' | grep -v '^timestamp,type,count,uniques' | \
+          awk -F, '{
+            key = $1","$2;
+            data[key] = $0;
+          }
+          END {
+            for (k in data) print data[k]
+          }' > "$MERGED_FILE"
 
-          # Compute running totals
+          # Calculate running totals from merged data
           VIEWS_TOTAL=$(grep ',views,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')
           CLONES_TOTAL=$(grep ',clones,' "$MERGED_FILE" | awk -F, '{c+=$3; u+=$4} END {print c","u}')
 
-          # Write summary + header + logs, keeping header at top and bottom if desired
+          # Write final CSV with summary at top and bottom with header lines
           {
             echo "summary,views,$VIEWS_TOTAL"
             echo "summary,clones,$CLONES_TOTAL"
             echo "timestamp,type,count,uniques"
-            grep -v -e '^summary' -e '^timestamp,type,count,uniques' "$MERGED_FILE"
+            cat "$MERGED_FILE"
             echo "timestamp,type,count,uniques"
           } > "$TRAFFIC_FILE"
 
-          # Commit changes if any
+          # Commit and push updated traffic_log.csv if changed
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           git add "$TRAFFIC_FILE"

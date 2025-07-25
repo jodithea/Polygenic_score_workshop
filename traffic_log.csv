@@ -1,9 +1,9 @@
-summary,views,278,24
-summary,clones,63,53
+summary,views,357,29
+summary,clones,92,74
 timestamp,type,count,uniques
 2025-07-22T00:00:00Z,clones,52,42
 2025-07-22T00:00:00Z,views,203,3
 2025-07-23T00:00:00Z,clones,3,3
-2025-07-24T00:00:00Z,clones,8,8
-2025-07-24T00:00:00Z,views,75,21
+2025-07-24T00:00:00Z,clones,37,29
+2025-07-24T00:00:00Z,views,154,26
 timestamp,type,count,uniques

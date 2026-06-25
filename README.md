@@ -5,6 +5,8 @@
 	- '01_Creating_Polygenic_Scores.pdf': Presentation given by Dr. Brittany Mitchell
 	- '02_Evaluating_Polygenic_Scores.pdf': Presentation given by Dr. Jodi Thomas
 
+NOTE update on 25th June 2026: 01_Create_PGS/04_Align_genotype_data_with_SBayesRC.sh script has been updated. The plink flag --keep-allele-order has been added. This is very important, as otherwise A1/A2 order in the input genotype file isn't necessarily preserved, plink will automatically update so A2 is the major allele. This can cause problems with the logic in this script of updating alleles.
+
 # Getting Started
 
 ## Clone the repository

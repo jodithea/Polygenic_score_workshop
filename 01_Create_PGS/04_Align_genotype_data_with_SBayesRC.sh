@@ -159,6 +159,7 @@ if [[ -s aligned_genotype_data/keep_snps.txt ]]; then
   OUT=${OUT}_snpstokeep
   plink --bfile ${Genotype} \
     --extract aligned_genotype_data/keep_snps.txt \
+    --keep-allele-order \
     --make-bed \
     --out ${OUT}
   INPUT=${OUT}
@@ -169,6 +170,7 @@ if [[ -s aligned_genotype_data/keep_snps.txt ]]; then
     OUT=${OUT}_flippedstrands
     plink --bfile ${INPUT} \
       --flip aligned_genotype_data/strand_flip.txt \
+      --keep-allele-order \
       --make-bed \
       --out ${OUT}
     INPUT=${OUT}
@@ -182,6 +184,7 @@ if [[ -s aligned_genotype_data/keep_snps.txt ]]; then
     OUT=${OUT}_updatedalleles
     plink --bfile ${INPUT} \
       --update-alleles aligned_genotype_data/update_alleles.txt \
+      --keep-allele-order \
       --make-bed \
       --out ${OUT}
     FINAL_OUTPUT=${OUT}
@@ -199,3 +202,5 @@ fi
 rm bim_rs_sorted.txt snpRes_sorted.txt
 
 # Remove duplicated SNPs - not needed. The LD matrix data used by SBayesRC has no duplicated SNPs so when matching to this file any duplicates will be removed
+
+# NOTE: adding --keep-allele-order flag to plink is very important. Otherwise A1/A2 order in input genotype file isn't necessarily preserved, plink will automatically update so A2 is the major allele. This can cause problems with the logic in this script of updating alleles

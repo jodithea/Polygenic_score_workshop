@@ -173,3 +173,7 @@ Follow the scripts in the '01_Create_PGS' directory. Below is a step-by-step sum
 		- Scripts: '06_AUC_Method1.R' and '07_AUC_Method2.R'
 		- Evaluate how well the PGS discriminates between cases and controls
 
+# Disclaimer
+
+* This dataset is provided as-is without warranty of any kind. Users are responsible for verifying the data before use
+* If you spot any errors or issues, please get in touch — feedback is greatly appreciated

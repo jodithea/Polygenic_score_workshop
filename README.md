@@ -175,5 +175,5 @@ Follow the scripts in the '01_Create_PGS' directory. Below is a step-by-step sum
 
 # Disclaimer
 
-* This dataset is provided as-is without warranty of any kind. Users are responsible for verifying the data before use
+* This workshop is provided as-is without warranty of any kind. Users are responsible for verifying the workshop before use
 * If you spot any errors or issues, please get in touch — feedback is greatly appreciated

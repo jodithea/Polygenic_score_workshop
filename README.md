@@ -10,8 +10,8 @@
 15 July 2026:
 * The allele-swapping step in 01_Create_PGS/04_Align_genotype_data_with_SBayesRC.sh was removed after additional validation
 * Previously, SNPs where the genotype data and SBayesRC weights file contained the same alleles in reverse order (e.g. A/G vs G/A) were treated as requiring genotype allele updates so that A1 matched between files
-* Single-SNP validation demonstrated that this approach could alter how PLINK interpreted and scored SNPs - allele labels were updated but not the underlying genotype dosages. 
-* PLINK --score does not require A1(genotype) = A1(weights file); instead, PLINK uses the effect allele specified in the score file and counts copies of that allele in the genotype data
+* Single-SNP validation demonstrated that this approach could alter how PLINK interpreted and scored SNPs - allele labels were updated but not the underlying genotype dosages
+* PLINK --score does not require A1(genotype) = A1(weights file); instead, PLINK uses the effect allele specified in the weights file and counts copies of that allele in the genotype data
 * Therefore reversal of the order of alleles between the genotype data and the SBayesRC .snpRes weights file are no longer corrected 
 
 25 June 2026:

@@ -66,4 +66,4 @@ ggplot(roc_combined_df, aes(x = specificity, y = sensitivity, colour = model, li
           legend.title = element_blank(),
           legend.text = element_text(size = 10, colour = "black"),
           legend.position = "none")
-  ## ----
+## ----

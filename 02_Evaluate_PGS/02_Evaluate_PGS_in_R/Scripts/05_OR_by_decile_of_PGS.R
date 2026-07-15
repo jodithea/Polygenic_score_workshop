@@ -78,7 +78,7 @@ or_table <- tidy(decile_model_lowest, exponentiate = TRUE, conf.int = TRUE, conf
     sig_label = ifelse(p.value_adjusted < 0.05, "*", "")
   ) 
 
-a <- ggplot(or_table, aes(x = decile, y = estimate)) +
+ggplot(or_table, aes(x = decile, y = estimate)) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "gray") +
   geom_point() +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
@@ -115,7 +115,7 @@ or_table <- tidy(decile_model_mid, exponentiate = TRUE, conf.int = TRUE, conf.le
     sig_label = ifelse(p.value_adjusted < 0.05, "*", "")
   ) 
 
-a <- ggplot(or_table, aes(x = decile, y = estimate)) +
+ggplot(or_table, aes(x = decile, y = estimate)) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "gray") +
   geom_point() +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +

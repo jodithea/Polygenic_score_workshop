@@ -6,6 +6,7 @@ Genotype_data/
 01_Create_PGS/Plink_PGS_scores/
 01_Create_PGS/ILAE3_Caucasian_all_epilepsy_imputed_allblocks.ma
 01_Create_PGS/tests/
+01_Create_PGS/old/
 *.sh.*
 .Rproj.user
 *.prune.in

@@ -5,7 +5,18 @@
 	- '01_Creating_Polygenic_Scores.pdf': Presentation given by Dr. Brittany Mitchell
 	- '02_Evaluating_Polygenic_Scores.pdf': Presentation given by Dr. Jodi Thomas
 
-NOTE update on 25th June 2026: 01_Create_PGS/04_Align_genotype_data_with_SBayesRC.sh script has been updated. The plink flag --keep-allele-order has been added. This is very important, as otherwise A1/A2 order in the input genotype file isn't necessarily preserved, plink will automatically update so A2 is the major allele. This can cause problems with the logic in this script of updating alleles.
+### NOTE updates to alignment script:
+
+15 July 2026:
+* The allele-swapping step in 01_Create_PGS/04_Align_genotype_data_with_SBayesRC.sh was removed after additional validation
+* Previously, SNPs where the genotype data and SBayesRC weights file contained the same alleles in reverse order (e.g. A/G vs G/A) were treated as requiring genotype allele updates so that A1 matched between files
+* Single-SNP validation demonstrated that this approach could alter how PLINK interpreted and scored SNPs - allele labels were updated but not the underlying genotype dosages. 
+* PLINK --score does not require A1(genotype) = A1(weights file); instead, PLINK uses the effect allele specified in the score file and counts copies of that allele in the genotype data
+* Therefore reversal of the order of alleles between the genotype data and the SBayesRC .snpRes weights file are no longer corrected 
+
+25 June 2026:
+* The plink flag --keep-allele-order was added to 01_Create_PGS/04_Align_genotype_data_with_SBayesRC.sh
+* This is important because otherwise PLINK may reorder allele labels when writing new genotype files, resulting in A1/A2 labels that differ between the input and output .bim files 
 
 # Getting Started
 
@@ -112,10 +123,10 @@ Follow the scripts in the '01_Create_PGS' directory. Below is a step-by-step sum
 ## Align Genotype Data with *.snpRes File
 
 * Script: '04_Align_genotype_data_with_SBayesRC.sh'
-* Ensure SNPs and alleles in the genotype data align with those in the *.snpRes file
-* Ambiguous SNPs (i.e. A/T and C/G) are removed
+* SNPs with alleles matching across the genotype data and the SBayesRC weights file (*.snpRes file) are retained
+* Ambiguous SNPs (i.e. A/T and C/G) are removed because strand orientation cannot be determined reliably
 * Strand flipping is done where required (e.g. A/G vs T/C)
-* Allele flipping is done where required (e.g. A/G va G/A)
+* Allele-order differences alone (e.g. A/G vs G/A) are retained and do not require allele swapping because PLINK --score can score the specified effect allele directly
 * Changes are made to the genotype data. The SBayesRC *.snpRes file remains unchanged
 
 ## Run PLINK to Calulate Polygenic Scores

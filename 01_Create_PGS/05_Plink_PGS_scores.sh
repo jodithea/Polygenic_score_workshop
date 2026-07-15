@@ -16,10 +16,8 @@ directory=/path/PGS_Workshop/01_Create_PGS/
 # SBayesRC output file wih SNP results
 PGS_weights=${directory}SBayesRC_output/ILAE3_Caucasian_all_epilepsy_SBayesRC.snpRes
 
-# Aligned genotype data - extract filename of final aligned genotype file from output log
-Genotype_aligned=$(grep "Final PLINK output is:" ${directory}04_Align_genotype_data_with_SBayesRC.sh.o* | \
-                   awk -F': ' '{print $2}' | \
-                   sed 's/\.bed.*//')
+# Aligned genotype data - extract filename of final aligned genotype file
+Genotype_aligned=$(cat ${directory}aligned_genotype_data/final_output_prefix.txt)
 
 # Path to formatted GWAS summary stats (in COJO format)
 GWAS_sumstats=/path/PGS_Workshop/Published_summary_stats/Epilepsy_ILAE3/ILAE3_Caucasian_all_epilepsy_formatted.ma

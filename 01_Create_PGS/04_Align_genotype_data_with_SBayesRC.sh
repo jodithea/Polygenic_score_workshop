@@ -192,9 +192,10 @@ rm bim_rs_sorted.txt snpRes_sorted.txt
 # Remove duplicated SNPs - not needed. The LD matrix data used by SBayesRC has no duplicated SNPs so when matching to this file any duplicates will be removed
 
 # NOTE: The --keep-allele-order flag is important because it preserves the
-# allele order recorded in the input .bim file. Without this option, PLINK may
-# reorder A1/A2 when writing output files, so the allele labels in the output
-# .bim may differ from those in the input .bim.
+# allele order recorded in the input .bim file. Without this option, PLINK automatically
+# reorders alleles so A2 = major allele writing output files, so the allele labels in the output
+# .bim may differ from those in the input .bim. This occurs silently with no message
+# in the log files.
 
 
 # NOTE: It is NOT necessary to swap alleles simply because the allele order differs
@@ -211,21 +212,47 @@ rm bim_rs_sorted.txt snpRes_sorted.txt
 # updating or A1/A2 swapping.
 #
 # Attempting to force A1(genotype)=A1(weights file) can introduce errors because
-# the allele order recorded in the .bim file is not necessarily the same as
-# PLINK's internal A1/A2 assignment used during analyses. For example, a SNP
-# may appear in the .bim file as:
+# --update-alleles only changes allele labels and not the underlying genotype
+# data.
 #
-#   A G
+# Example:
+# .bim file:
+# 3	rs13061336	0	113854855	A	G
+# Check dosages using the following code
+# plink \
+#  --bfile ${INPUT} \
+#  --snp rs13061336 \
+#  --keep-allele-order \
+#  --recode A include-alt \
+#  --out ${OUTPUT}
+# FID	IID	PAT	MAT	SEX	PHENOTYPE	rs13061336_A(/G)
+# 5533306	5533306	0	0	1	0.1	2
+# This individual has 2 copies of the A allele and 0 copies of the G allele
+
+# Now if we swap alleles using the following code
+# plink --bfile ${INPUT}\
+#      --update-alleles update_alleles.txt \
+#      --keep-allele-order \
+#      --make-bed \
+#      --out ${OUTPUT}
+# And the file update_alleles.txt uses the format rsID old_A1 old_A2 new_A1 new_A2 and looks like this:
+# rs13061336	A	G	G	A
+# The updated .bim file:
+# 3	rs13061336	0	113854855	G	A
+# And check dosages in the updated file using the following code
+# plink \
+#  --bfile ${INPUT} \
+#  --snp rs13061336 \
+#  --keep-allele-order \
+#  --recode A include-alt \
+#  --out ${OUTPUT}
+# FID	IID	PAT	MAT	SEX	PHENOTYPE	rs13061336_G(/A)
+# 5533306	5533306	0	0	1	0.1	2
+# This individual has 2 copies of the G allele and 0 copies of the A allele
 #
-# while PLINK reports:
-#
-#   A1=G, A2=A
-#
-# in --freq output. Therefore matching or swapping alleles solely on the basis
-# of .bim A1/A2 labels can change how genotypes are interpreted and alter PRS
-# calculations. This was confirmed during debugging checks, where allele-swapping changed the
-# allele labels recorded in the genotype data but not the underlying genotype
-# dosages. This altered how PLINK interpreted and scored the SNP, resulting in
+# So we can see that using --update-alleles flag has changed allele labels
+# but not the underlying genotype data
+# This will alter how PLINK interprets and scores the SNP, resulting in
 # inaccurate PRS calculations.
 #
 # True strand mismatches (e.g. A/C vs T/G) must still be corrected using
